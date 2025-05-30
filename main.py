@@ -43,11 +43,12 @@ uploaded_file = st.file_uploader("Upload your CSV file", type="csv")
 if uploaded_file:
     if "main_df" not in st.session_state:
         st.session_state.main_df = pd.read_csv(uploaded_file, dtype={'postal_code': 'str'})
-
-    df = st.session_state.main_df
+        if 'include' not in st.session_state.main_df.columns:
+            st.session_state.main_df['include'] = True
 
     # Fixed editable columns
     editable_cols = [
+        "include",
         "is_recruiter",
         "show_in_salary_analysis_graphic",
         "show_in_competitive_analysis_graphic"
@@ -107,7 +108,7 @@ if uploaded_file:
     print(edited_df)
     # Download full updated CSV
     if st.button("Download Updated CSV"):
-        csv = st.session_state.main_df.to_csv(index=False).encode("utf-8")
+        csv = st.session_state.main_df.drop(columns=['include']).to_csv(index=False).encode("utf-8")
         st.download_button("Download CSV", csv, "updated_data.csv", "text/csv")
 else:
     st.info("Please upload a CSV file.")
